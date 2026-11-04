@@ -1,0 +1,5 @@
+name: astrbot_plugin_fish_knowledge
+display_name: 大肥鱼知识管家
+desc: 按需搜索公开资料，带正文证据和版本入库，去重、过期管理、自动检索，并学习用户明确的交流反馈。
+version: 1.0.0
+author: local

@@ -1,0 +1,13 @@
+{
+  "enabled": {"type": "bool", "description": "启用知识管家", "default": true, "obvious_hint": true},
+  "auto_recall": {"type": "bool", "description": "聊天时自动检索相关知识", "default": true},
+  "learn_feedback": {"type": "bool", "description": "学习用户明确提出的交流习惯纠正", "default": true},
+  "daily_search_limit": {"type": "int", "description": "知识学习每日搜索上限", "default": 20, "hint": "仅约束本插件发起的搜索，不包含其他插件或原联网工具。"},
+  "daily_fetch_limit": {"type": "int", "description": "知识学习每日正文读取上限", "default": 40},
+  "pages_per_learning": {"type": "int", "description": "每次学习最多读取正文数", "default": 2},
+  "recall_limit": {"type": "int", "description": "每次最多召回知识条数", "default": 3},
+  "max_records": {"type": "int", "description": "知识库记录上限", "default": 1000},
+  "use_embedding": {"type": "bool", "description": "同时使用本地向量检索", "default": true, "hint": "优先复用现有本地bge-m3，不可用时降级到关键词。"},
+  "embedding_provider_id": {"type": "string", "description": "嵌入模型提供商ID", "default": "ollama-embed"},
+  "primary_domains": {"type": "list", "description": "允许单一正文证据入库的一手来源域名", "default": ["api-docs.deepseek.com", "docs.python.org", "learn.microsoft.com", "gov.cn"], "hint": "其他网站需两个不同域名的正文证据。域名规则只作为来源门槛，不能保证结论必然正确。"}
+}
