@@ -13,6 +13,7 @@ import httpx
 from astrbot.api import AstrBotConfig, logger
 from astrbot.api.event import AstrMessageEvent, filter
 from astrbot.api.star import Context, Star, StarTools, register
+from astrbot.core.agent.message import TextPart
 
 from .learning import KnowledgeLearner
 from .store import KnowledgeStore
@@ -21,7 +22,14 @@ from .store import KnowledgeStore
 PLUGIN_NAME = 'astrbot_plugin_fish_knowledge'
 
 
-@register(PLUGIN_NAME, 'local', '大肥鱼知识管家：公开资料查证、带来源入库、按需检索与交流反馈', '1.0.0')
+def temporary_text(text: str) -> TextPart:
+    part = TextPart(text=text)
+    # 兼容审核所述的 make_as_temp 与本机SDK的 mark_as_temp。
+    make_temp = getattr(part, 'make_as_temp', None)
+    return make_temp() if callable(make_temp) else part.mark_as_temp()
+
+
+@register(PLUGIN_NAME, 'local', '大肥鱼知识管家：公开资料查证、带来源入库、按需检索与交流反馈', '1.0.1')
 class FishKnowledge(Star):
     def __init__(self, context: Context, config: AstrBotConfig | None = None):
         super().__init__(context)
@@ -136,7 +144,10 @@ class FishKnowledge(Star):
                     '已有知识可用fish_knowledge_find查找。私人经历由原记忆系统处理。'
                     '收到明确的交流习惯纠正时可用fish_style_feedback记录原话支持的偏好。'
                     '后台学习无需向群友汇报，不为调用工具而打断闲聊。')
-            request.system_prompt = (request.system_prompt or '') + '\n\n' + hint + '\n' + '\n'.join(blocks)[:2600]
+            # 每轮变化的数据放在当前用户消息末尾；临时块不写入会话历史。
+            # 不改 system_prompt、已有 contexts 或用户原始 prompt，保留稳定前缀。
+            content = '<fish_knowledge_turn_context>\n' + hint + '\n' + '\n'.join(blocks)[:2600] + '\n</fish_knowledge_turn_context>'
+            request.extra_user_content_parts.append(temporary_text(content))
         except Exception as exc:
             logger.warning('[知识管家] 本轮检索降级，原因类型=%s', type(exc).__name__)
 
